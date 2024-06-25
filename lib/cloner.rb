@@ -30,7 +30,7 @@ class Cloner
           end
         end
 
-        copy = Issue.new.copy_from(original, { :attachments => false, :watchers => true })
+        copy = self.clone_issue_with_children(original)
         copy.start_date = Time.now
 
         if original.due_date.present?
@@ -38,7 +38,7 @@ class Cloner
           copy.due_date = copy.start_date + (original.due_date - issue_date)
         end
 
-        original.children.each do |child|
+        copy.children.each do |child|
           child.start_date = Time.now
 
           if original.due_date.present?
@@ -56,6 +56,20 @@ class Cloner
 
         copy.save!
         puts("Issue##{original.start_date} cloned to ##{copy.id}")
+    end
+
+    def self.clone_issue_with_children(original_issue)
+      cloned_issue = Issue.new.copy_from(original_issue, { attachments: false, watchers: true })
+      cloned_issue.parent_issue_id = original_issue.parent_issue_id
+      cloned_issue.save!
+
+      original_issue.children.each do |child_issue|
+        cloned_child_issue = clone_issue_with_children(child_issue)
+        cloned_child_issue.parent_issue_id = cloned_issue.id
+        cloned_child_issue.save!
+      end
+
+      cloned_issue
     end
 
     def self.duration(variant)
