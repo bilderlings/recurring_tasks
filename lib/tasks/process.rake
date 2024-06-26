@@ -10,7 +10,7 @@ namespace :recurring_tasks do
 
     fields.each do |field|
       duration = Cloner.duration(field.value)
-      return unless duration
+      next unless duration
       puts("Found Issue##{field.customized_id} with recurring = #{field.value}")
       Cloner.clone(field.customized_id, duration, custom_field.id)
     end
