@@ -1,6 +1,10 @@
 class Cloner
 
   def self.clone(issue_id, duration, recurring_field_id)
+    original_user = User.current
+    admin_user = User.find_by(admin: true)
+    User.current = admin_user
+
     original = Issue.find_by_id(issue_id)
     unless original
       puts("Original issue not found Issue##{issue_id}")
@@ -36,6 +40,8 @@ class Cloner
 
       puts("Issue##{original.id} cloned to ##{copy.id}")
     end
+
+    User.current = original_user
   end
 
   def self.clone_issue_with_children(original_issue, recurring_field_id)
