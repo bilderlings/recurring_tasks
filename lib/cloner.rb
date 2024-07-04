@@ -40,6 +40,7 @@ class Cloner
 
   def self.clone_issue_with_children(original_issue, recurring_field_id)
     cloned_issue = Issue.new.copy_from(original_issue, { :attachments => false, })
+    cloned_issue.assigned_to_id = nil
 
     if original_issue.due_date.present?
       issue_date = (original_issue.start_date || original_issue.created_on).to_date
@@ -50,6 +51,11 @@ class Cloner
       h[v.custom_field_id] = v.custom_field_id == recurring_field_id ? nil : v.value
       h
     end
+
+    cloned_issue.children.each do |child_issue|
+      child_issue.assigned_to_id = nil
+    end
+
 
     cloned_issue.save!
     self.start_date_now(cloned_issue)
