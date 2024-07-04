@@ -43,7 +43,7 @@ class Cloner
 
     if original_issue.due_date.present?
       issue_date = (original_issue.start_date || original_issue.created_on).to_date
-      copy.due_date = copy.start_date + (original_issue.due_date - issue_date)
+      cloned_issue.due_date = cloned_issue.start_date + (original_issue.due_date - issue_date)
     end
 
     cloned_issue.custom_field_values = cloned_issue.custom_field_values.inject({}) do |h, v|
