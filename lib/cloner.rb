@@ -9,6 +9,10 @@ class Cloner
   end
 
   def self.clone(issue_id, duration, recurring_field_id)
+    original_user = User.current
+    admin_user = User.find_by(admin: true)
+    User.current = admin_user
+
     original = Issue.find_by_id(issue_id)
     unless original
       logger.warn("Original issue not found Issue##{issue_id}")
@@ -66,6 +70,8 @@ class Cloner
 
       logger.info("Issue:#{issue_id} copied to Issue:#{copied_issue.id}")
     end
+
+    User.current = original_user
   end
 
   def self.duration(variant)
